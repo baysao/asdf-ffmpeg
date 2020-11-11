@@ -23,10 +23,10 @@ _install(){
 	cat ffmpeg.sh
 	echo $install_path/lib >  /etc/ld.so.conf.d/ffmpeg.conf
 	echo /opt/ffmpeg/lib >>  /etc/ld.so.conf.d/ffmpeg.conf
+	ldconfig
         bash -x ffmpeg.sh
 	mv /opt/ffmpeg/* $install_path/
 	rm -rf /opt/ffmpeg /tmp/ffmpeg
-	ldconfig
 	rm -rf $tmpd
 }
 
