@@ -21,10 +21,11 @@ _install(){
         bash ./docker2sh.sh Docker_ffmpeg ffmpeg.sh
         sed "s/-j2/-j$(nproc)/g" ffmpeg.sh -i
 	cat ffmpeg.sh
+	echo $install_path/lib >  /etc/ld.so.conf.d/ffmpeg.conf
+	echo /opt/ffmpeg/lib >>  /etc/ld.so.conf.d/ffmpeg.conf
         bash -x ffmpeg.sh
 	mv /opt/ffmpeg/* $install_path/
 	rm -rf /opt/ffmpeg /tmp/ffmpeg
-	echo $install_path/lib >  /etc/ld.so.conf.d/ffmpeg.conf
 	ldconfig
 	rm -rf $tmpd
 }
