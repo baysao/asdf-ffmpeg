@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-dist_id=$(awk -F'=' '/DISTRIB_ID/{print $2}' /etc/lsb-release)
-dist_release=$(awk -F'=' '/DISTRIB_RELEASE/{print $2}' /etc/lsb-release)
+dist_id=ubuntu
+#$(awk -F'=' '/DISTRIB_ID/{print $2}' /etc/lsb-release)
+dist_release=1804
+#$(awk -F'=' '/DISTRIB_RELEASE/{print $2}' /etc/lsb-release)
 dist_code=$(awk -F'=' '/DISTRIB_CODE/{print $2}' /etc/lsb-release)
 
 _install(){
+	apt install -y libass-dev
 	dir=$PWD
 	local install_type=$1
 	local version=$2
@@ -14,10 +17,15 @@ _install(){
 	curl -skL https://raw.githubusercontent.com/jrottenberg/ffmpeg/master/docker-images/snapshot/$(echo ${dist_id}${dist_release} | awk '{sub(/\./,"",$0);print tolower($0)}')/Dockerfile -o Docker_ffmpeg
 	#sed 's/opt\/ffmpeg/usr\/local/g' -i Docker_ffmpeg
         sed 's/DIR=/cd \/tmp;DIR=/g' -i Docker_ffmpeg
-        bash $dir/docker2sh.sh Docker_ffmpeg ffmpeg.sh
+	curl -skL https://raw.githubusercontent.com/baysao/asdf-ffmpeg/master/bin/docker2sh.sh -o docker2sh.sh
+        bash ./docker2sh.sh Docker_ffmpeg ffmpeg.sh
         sed "s/-j2/-j$(nproc)/g" ffmpeg.sh -i
 	cat ffmpeg.sh
         bash -x ffmpeg.sh
+	mv /opt/ffmpeg/* $install_path/
+	rm -rf /opt/ffmpeg /tmp/ffmpeg
+	echo $install_path/lib >  /etc/ld.so.conf.d/ffmpeg.conf
+	ldconfig
 	rm -rf $tmpd
 }
 
