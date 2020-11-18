@@ -4,30 +4,40 @@ dist_id=ubuntu
 dist_release=1804
 #$(awk -F'=' '/DISTRIB_RELEASE/{print $2}' /etc/lsb-release)
 dist_code=$(awk -F'=' '/DISTRIB_CODE/{print $2}' /etc/lsb-release)
-
 _install(){
-	apt install -y libass-dev
-	dir=$PWD
+	echo $@
+#	apt install -y libass-dev
+	dir=$ASDF_DIR/plugins/ffmpeg/bin
 	local install_type=$1
 	local version=$2
 	version1=$(echo $version | sed 's/^v//')
 	local install_path=$3
 	tmpd=$(mktemp -d)
 	cd $tmpd
-	curl -skL https://raw.githubusercontent.com/jrottenberg/ffmpeg/master/docker-images/snapshot/$(echo ${dist_id}${dist_release} | awk '{sub(/\./,"",$0);print tolower($0)}')/Dockerfile -o Docker_ffmpeg
+	#curl -skL https://raw.githubusercontent.com/jrottenberg/ffmpeg/master/docker-images/snapshot/$(echo ${dist_id}${dist_release} | awk '{sub(/\./,"",$0);print tolower($0)}')/Dockerfile -o Docker_ffmpeg
+	#echo /usr/local/lib >  /etc/ld.so.conf.d/ffmpeg.conf
+	#ldconfig
 	#sed 's/opt\/ffmpeg/usr\/local/g' -i Docker_ffmpeg
-        sed 's/DIR=/cd \/tmp;DIR=/g' -i Docker_ffmpeg
-	curl -skL https://raw.githubusercontent.com/baysao/asdf-ffmpeg/master/bin/docker2sh.sh -o docker2sh.sh
-        bash ./docker2sh.sh Docker_ffmpeg ffmpeg.sh
-        sed "s/-j2/-j$(nproc)/g" ffmpeg.sh -i
-	cat ffmpeg.sh
-	echo $install_path/lib >  /etc/ld.so.conf.d/ffmpeg.conf
-	echo /opt/ffmpeg/lib >>  /etc/ld.so.conf.d/ffmpeg.conf
-        bash -x ffmpeg.sh
-	mv /opt/ffmpeg/* $install_path/
-	rm -rf /opt/ffmpeg /tmp/ffmpeg
-	ldconfig
-	rm -rf $tmpd
+        #sed 's/DIR=/cd \/tmp;DIR=/g' -i Docker_ffmpeg
+	#curl -skL https://raw.githubusercontent.com/baysao/asdf-ffmpeg/master/bin/docker2sh.sh -o docker2sh.sh
+        #bash ./docker2sh.sh Docker_ffmpeg ffmpeg.sh
+        #sed "s/-j2/-j$(nproc)/g" ffmpeg.sh -i
+	#sed '/--enable-theora/d' ffmpeg.sh -i 
+	#sed 's/sha256sum/echo sha256sum/g' ffmpeg.sh -i
+	#sed 's/FREETYPE_VERSION=2.5.5/FREETYPE_VERSION=2.10.4/g' ffmpeg.sh -i
+	#sed 's/LIBPNG_VERSION=1.6.9/LIBPNG_VERSION=1.6.37/g' ffmpeg.sh -i
+	#sed 's/configure/configure --disable-examples/g' ffmpeg.sh -i
+	#sed 's/http:\/\/downloads.xiph.org\/releases\/theora\/libtheora-${THEORA_VERSION}.tar.gz/https\:\/\/gitlab.xiph.org\/xiph\/theora\/-\/archive\/master\/theora-master.tar.gz \&\& mv theora-master.tar.gz libtheora-${THEORA_VERSION}.tar.gz/g' ffmpeg.sh -i
+	#sed 's/tar -zx --strip-components=1 -f libtheora/sh autogen.sh \&\& tar -zx --strip-components=1 -f libtheora/g' ffmpeg.sh  -i
+	#sed 's/configure --prefix="${PREFIX}" --with-ogg/configure --disable-examples --prefix="${PREFIX}" --with-ogg/' ffmpeg.sh -i
+	sed "s/FFMPEG_VERSION=snapshot/FFMPEG_VERSION=$version/g" $dir/ffmpeg.sh  > build.sh
+	cat build.sh
+	#echo $install_path/lib >  /etc/ld.so.conf.d/ffmpeg.conf
+	#cp ffmpeg.sh $dir/ffmpeg.sh 
+        bash -x build.sh
+	#mv /opt/ffmpeg/* $install_path/
+	#rm -rf $tmpd /opt/ffmpeg /tmp/ffmpeg
 }
 
 _install $ASDF_INSTALL_TYPE $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH
+#_install version 4.1.6 /root/.asdf/installs/ffmpeg/4.1.6
