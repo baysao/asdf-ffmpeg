@@ -6,7 +6,6 @@ dist_release=1804
 dist_code=$(awk -F'=' '/DISTRIB_CODE/{print $2}' /etc/lsb-release)
 _install(){
 	echo $@
-#	apt install -y libass-dev
 	dir=$ASDF_DIR/plugins/ffmpeg/bin
 	local install_type=$1
 	local version=$2
@@ -16,29 +15,10 @@ _install(){
 	cd $tmpd
 	echo $install_path/lib >  /etc/ld.so.conf.d/ffmpeg.conf
 	cp /etc/ld.so.conf.d/ffmpeg.conf $install_path/lib.conf
-	#curl -skL https://raw.githubusercontent.com/jrottenberg/ffmpeg/master/docker-images/snapshot/$(echo ${dist_id}${dist_release} | awk '{sub(/\./,"",$0);print tolower($0)}')/Dockerfile -o Docker_ffmpeg
-	#echo /usr/local/lib >  /etc/ld.so.conf.d/ffmpeg.conf
-	#ldconfig
-	#sed 's/opt\/ffmpeg/usr\/local/g' -i Docker_ffmpeg
-        #sed 's/DIR=/cd \/tmp;DIR=/g' -i Docker_ffmpeg
-	#curl -skL https://raw.githubusercontent.com/baysao/asdf-ffmpeg/master/bin/docker2sh.sh -o docker2sh.sh
-        #bash ./docker2sh.sh Docker_ffmpeg ffmpeg.sh
-        #sed "s/-j2/-j$(nproc)/g" ffmpeg.sh -i
-	#sed '/--enable-theora/d' ffmpeg.sh -i 
-	#sed 's/sha256sum/echo sha256sum/g' ffmpeg.sh -i
-	#sed 's/FREETYPE_VERSION=2.5.5/FREETYPE_VERSION=2.10.4/g' ffmpeg.sh -i
-	#sed 's/LIBPNG_VERSION=1.6.9/LIBPNG_VERSION=1.6.37/g' ffmpeg.sh -i
-	#sed 's/configure/configure --disable-examples/g' ffmpeg.sh -i
-	#sed 's/http:\/\/downloads.xiph.org\/releases\/theora\/libtheora-${THEORA_VERSION}.tar.gz/https\:\/\/gitlab.xiph.org\/xiph\/theora\/-\/archive\/master\/theora-master.tar.gz \&\& mv theora-master.tar.gz libtheora-${THEORA_VERSION}.tar.gz/g' ffmpeg.sh -i
-	#sed 's/tar -zx --strip-components=1 -f libtheora/sh autogen.sh \&\& tar -zx --strip-components=1 -f libtheora/g' ffmpeg.sh  -i
-	#sed 's/configure --prefix="${PREFIX}" --with-ogg/configure --disable-examples --prefix="${PREFIX}" --with-ogg/' ffmpeg.sh -i
 	sed "s/FFMPEG_VERSION=snapshot/FFMPEG_VERSION=$version/g" $dir/ffmpeg.sh  > build.sh
 	sed "s/PREFIX_FFMPEG/$(echo $install_path | sed 's/\//\\\//g')/g"  -i build.sh
-	#sed "s/PREFIX_FFMPEG/$install_path/g"  build.sh -i
 	cat build.sh
 	cp build.sh $dir/build.sh
-	#cp ffmpeg.sh $dir/ffmpeg.sh 
-	#sed '/libaribb24/d' -i build.sh
         bash -x build.sh
 	mv /opt/ffmpeg/* $install_path/
 	rm -rf $tmpd /opt/ffmpeg /tmp/ffmpeg
