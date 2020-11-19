@@ -15,6 +15,7 @@ _install(){
 	tmpd=$(mktemp -d)
 	cd $tmpd
 	echo $install_path/lib >  /etc/ld.so.conf.d/ffmpeg.conf
+	cp /etc/ld.so.conf.d/ffmpeg.conf $install_path/lib.conf
 	#curl -skL https://raw.githubusercontent.com/jrottenberg/ffmpeg/master/docker-images/snapshot/$(echo ${dist_id}${dist_release} | awk '{sub(/\./,"",$0);print tolower($0)}')/Dockerfile -o Docker_ffmpeg
 	#echo /usr/local/lib >  /etc/ld.so.conf.d/ffmpeg.conf
 	#ldconfig
