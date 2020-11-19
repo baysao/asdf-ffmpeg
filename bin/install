@@ -14,6 +14,7 @@ _install(){
 	local install_path=$3
 	tmpd=$(mktemp -d)
 	cd $tmpd
+	echo $install_path/lib >  /etc/ld.so.conf.d/ffmpeg.conf
 	#curl -skL https://raw.githubusercontent.com/jrottenberg/ffmpeg/master/docker-images/snapshot/$(echo ${dist_id}${dist_release} | awk '{sub(/\./,"",$0);print tolower($0)}')/Dockerfile -o Docker_ffmpeg
 	#echo /usr/local/lib >  /etc/ld.so.conf.d/ffmpeg.conf
 	#ldconfig
@@ -31,12 +32,15 @@ _install(){
 	#sed 's/tar -zx --strip-components=1 -f libtheora/sh autogen.sh \&\& tar -zx --strip-components=1 -f libtheora/g' ffmpeg.sh  -i
 	#sed 's/configure --prefix="${PREFIX}" --with-ogg/configure --disable-examples --prefix="${PREFIX}" --with-ogg/' ffmpeg.sh -i
 	sed "s/FFMPEG_VERSION=snapshot/FFMPEG_VERSION=$version/g" $dir/ffmpeg.sh  > build.sh
+	sed "s/PREFIX_FFMPEG/$(echo $install_path | sed 's/\//\\\//g')/g"  -i build.sh
+	#sed "s/PREFIX_FFMPEG/$install_path/g"  build.sh -i
 	cat build.sh
-	#echo $install_path/lib >  /etc/ld.so.conf.d/ffmpeg.conf
+	cp build.sh $dir/build.sh
 	#cp ffmpeg.sh $dir/ffmpeg.sh 
+	#sed '/libaribb24/d' -i build.sh
         bash -x build.sh
-	#mv /opt/ffmpeg/* $install_path/
-	#rm -rf $tmpd /opt/ffmpeg /tmp/ffmpeg
+	mv /opt/ffmpeg/* $install_path/
+	rm -rf $tmpd /opt/ffmpeg /tmp/ffmpeg
 }
 
 _install $ASDF_INSTALL_TYPE $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH

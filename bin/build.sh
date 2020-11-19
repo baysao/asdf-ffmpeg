@@ -523,7 +523,7 @@ echo RUN;\
         --enable-libbluray \
         --enable-libzmq \
         --extra-libs=-ldl \
-        --prefix="PREFIX_FFMPEG" \
+        --prefix="/root/.asdf/installs/ffmpeg/snapshot" \
         --enable-libopenjpeg \
         --enable-libkvazaar \
         --enable-libaom \
